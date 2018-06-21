@@ -44,11 +44,16 @@ VSY	   PD2  	 //同步信号检测IO
 #include  "usart.h"
 
 ErrorStatus HSEStartUpStatus;
-//截取的范围
+//截取的范围 受缓冲区大小影响 colorsdata
 u16 gray_bx=0;
 u16 gray_by=0;
+//u16 gray_w=300;//256;//320;//256;
+//u16 gray_h=52;//52;
+
 u16 gray_w=300;//256;//320;//256;
-u16 gray_h=52;
+u16 gray_h=52;//52;
+
+//const u8 test[] = "123456";
 
 //有效位数
 u8 gray_n=8;//可取1，2，4，6，8
@@ -199,16 +204,26 @@ void process_data(void)
 	
 		gray_cnd--;//先减一，减少for里面的计算量
 					
-		for(i=0;i<=gray_cnd;i++)
+		for(i=0;i<=gray_cnd;i++) ///rgb 565
 		{
 			di=drowt[i]&0xff;
 			gao=(drowt[i]&0xff00) >> 8;
+			
+			#if 0    //init
 			r= (gao & 0xF8);
 			g= (gao << 5) | ((di & 0xE0) >> 3);
 			b=  di << 3;
 			
-			Y = (1*r + 150*g + 29*b)>>8;//Y = (r + g + b)/3;//Y = (77*r + 150*g + 29*b)>>8;
-
+			Y = (1*r + 150*g + 29*b)>>8;//Y = (r + g + b)/3;//Y = (77*r + 150*g + 29*b)>>8;			
+			#else
+			r= (gao & 0xF8);
+			g= (gao << 5) | ((di & 0xE0) >> 3);
+			b=  di << 3;
+			
+		//	Y = (1*r + 150*g + 29*b)>>8;//Y = (r + g + b)/3;//Y = (77*r + 150*g + 29*b)>>8;			
+		Y = (77*r + 150*g + 29*b)>>8;	///亮度较1*r 变强
+			#endif
+			
 			{
 					u32 temp;
 				
